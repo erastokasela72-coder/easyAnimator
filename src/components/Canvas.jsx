@@ -349,8 +349,9 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
       onClick={handleCanvasClick}
       className="
         relative
-        w-[1000px] h-[580px]
-        max-w-[calc(100vw-5rem)] max-h-[calc(100vh-240px)]
+        w-[320px] sm:w-[600px] md:w-[800px] lg:w-[1000px] 
+        h-[200px] sm:h-[350px] md:h-[450px] lg:h-[580px]
+        max-w-[calc(100vw-2rem)] max-h-[calc(100vh-200px)]
         rounded-xl
         border border-white/10
         shadow-[0_0_30px_rgba(0,0,0,0.6)]

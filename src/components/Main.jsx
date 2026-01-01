@@ -100,8 +100,26 @@ function Main() {
     try {
       // Create a hidden canvas for recording
       const recordingCanvas = document.createElement('canvas')
-      recordingCanvas.width = 1000
-      recordingCanvas.height = 580
+      // Use responsive dimensions based on screen size
+      const screenWidth = window.innerWidth
+      let canvasWidth, canvasHeight
+      
+      if (screenWidth < 640) { // mobile
+        canvasWidth = 320
+        canvasHeight = 200
+      } else if (screenWidth < 768) { // tablet
+        canvasWidth = 600
+        canvasHeight = 350
+      } else if (screenWidth < 1024) { // medium
+        canvasWidth = 800
+        canvasHeight = 450
+      } else { // desktop
+        canvasWidth = 1000
+        canvasHeight = 580
+      }
+      
+      recordingCanvas.width = canvasWidth
+      recordingCanvas.height = canvasHeight
       const ctx = recordingCanvas.getContext('2d')
       
       // Try to use MediaRecorder
@@ -188,7 +206,7 @@ function Main() {
         
         // Clear canvas with background
         ctx.fillStyle = bgColor
-        ctx.fillRect(0, 0, 1000, 580)
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight)
         
         // Get interpolated assets for this time
         const interpolatedAssets = interpolateAssets(time, assets, keyframes)
@@ -288,48 +306,49 @@ function Main() {
     <div className="h-screen bg-slate-950 text-white overflow-hidden flex flex-col">
 
       {/* Top bar */}
-      <header className="h-[72px] flex items-center justify-between px-10 shrink-0">
-        <div className="flex items-center gap-2 text-2xl font-bold text-blue-400 drop-shadow-[0_0_12px_rgba(59,130,246,0.9)]">
-          <MdOutlineAnimation className="text-3xl" />
-          easyAnimator
+      <header className="h-16 sm:h-20 lg:h-[72px] flex items-center justify-between px-4 sm:px-6 lg:px-10 shrink-0 flex-wrap gap-2">
+        <div className="flex items-center gap-2 text-xl sm:text-2xl font-bold text-blue-400 drop-shadow-[0_0_12px_rgba(59,130,246,0.9)]">
+          <MdOutlineAnimation className="text-2xl sm:text-3xl" />
+          <span className="hidden xs:inline">easyAnimator</span>
+          <span className="xs:hidden">EA</span>
         </div>
 
         {/* Middle toolbar with undo and text tools */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 order-3 sm:order-2 w-full sm:w-auto justify-center">
           <button
             onClick={handleUndo}
             disabled={historyIndex <= 0}
-            className={`p-2 rounded-lg transition ${
+            className={`p-1.5 sm:p-2 rounded-lg transition ${
               historyIndex <= 0
                 ? 'bg-gray-700 cursor-not-allowed opacity-50'
                 : 'bg-gray-600 hover:bg-gray-500'
             }`}
             title="Undo"
           >
-            <Undo className="w-5 h-5" />
+            <Undo className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           <button
             onClick={handleAddText}
-            className="p-2 rounded-lg transition bg-gray-600 hover:bg-gray-500"
+            className="p-1.5 sm:p-2 rounded-lg transition bg-gray-600 hover:bg-gray-500"
             title="Add Text"
           >
-            <Type className="w-5 h-5" />
+            <Type className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           {/* Text properties */}
-          <div className="flex items-center gap-2 border-l border-gray-600 pl-4">
+          <div className="flex items-center gap-1 sm:gap-2 border-l border-gray-600 pl-2 sm:pl-4">
             <input
               type="color"
               value={textColor}
               onChange={(e) => setTextColor(e.target.value)}
-              className="w-8 h-8 rounded cursor-pointer"
+              className="w-6 h-6 sm:w-8 sm:h-8 rounded cursor-pointer"
               title="Text Color"
             />
             <select
               value={textFont}
               onChange={(e) => setTextFont(e.target.value)}
-              className="bg-gray-700 text-white px-2 py-1 rounded text-sm"
+              className="bg-gray-700 text-white px-1 py-1 sm:px-2 sm:py-1 rounded text-xs sm:text-sm"
               title="Font"
             >
               <option value="Arial">Arial</option>
@@ -341,7 +360,7 @@ function Main() {
             </select>
             <button
               onClick={() => setTextBold(!textBold)}
-              className={`px-3 py-1 rounded text-sm font-bold transition ${
+              className={`px-2 py-1 sm:px-3 sm:py-1 rounded text-xs sm:text-sm font-bold transition ${
                 textBold
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
@@ -353,34 +372,35 @@ function Main() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm opacity-70">Canvas</span>
+        <div className="flex items-center gap-2 sm:gap-4 order-2 sm:order-3">
+          <div className="flex items-center gap-1 sm:gap-2 hidden sm:flex">
+            <span className="text-xs sm:text-sm opacity-70">Canvas</span>
             <input
               type="color"
               value={bgColor}
               onChange={(e) => setBgColor(e.target.value)}
-              className="w-9 h-9 rounded-md cursor-pointer bg-transparent"
+              className="w-7 h-7 sm:w-9 sm:h-9 rounded-md cursor-pointer bg-transparent"
             />
           </div>
 
           <button
             onClick={handleDownload}
             disabled={isExporting}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition ${
+            className={`flex items-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition ${
               isExporting
                 ? 'bg-gray-500 cursor-not-allowed opacity-50'
                 : 'bg-blue-500 hover:bg-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.8)]'
             }`}
           >
-            <MdDownload className="text-lg" />
-            {isExporting ? 'Exporting...' : 'Download'}
+            <MdDownload className="text-base sm:text-lg" />
+            <span className="hidden sm:inline">{isExporting ? 'Exporting...' : 'Download'}</span>
+            <span className="sm:hidden">{isExporting ? '...' : '⬇'}</span>
           </button>
         </div>
       </header>
 
       {/* Workspace */}
-      <main className="flex-1 flex flex-col items-center justify-center gap-4 px-10 pt-4 pb-4 min-h-0 overflow-hidden">
+      <main className="flex-1 flex flex-col items-center justify-center gap-4 px-2 sm:px-4 lg:px-10 pt-2 sm:pt-4 pb-2 sm:pb-4 min-h-0 overflow-hidden">
 
         {/* Canvas */}
         <div className="flex-1 flex items-center justify-center min-h-0 w-full">
@@ -400,7 +420,7 @@ function Main() {
         </div>
 
         {/* Timeline */}
-        <div className="shrink-0 w-full max-w-[1000px]">
+        <div className="shrink-0 w-full max-w-[1000px] px-2 sm:px-0">
           <Key 
             currentTime={currentTime}
             setCurrentTime={setCurrentTime}
