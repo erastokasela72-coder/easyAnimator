@@ -380,7 +380,7 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
     >
       {assets.length === 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-          <span className="text-xs sm:text-sm text-white/40 text-center px-4">
+          <span className="text-xs sm:text-sm text-black/40 text-center px-4">
             Drop PNG or JPG here or use the Text tool to add text
           </span>
           <label className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white rounded-lg cursor-pointer transition-colors text-xs sm:text-sm font-medium">
@@ -482,12 +482,12 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
                   onMouseDown={(e) => e.stopPropagation()} // Prevent drag when clicking on textarea
                   className="w-full h-full resize-none outline-none bg-transparent text-center pointer-events-none"
                   style={{
-                    color: asset.color || '#ffffff',
+                    color: asset.color || '#000000',
                     fontFamily: asset.font || 'Arial',
                     fontWeight: asset.bold ? 'bold' : 'normal',
                     fontSize: `${Math.max(12, Math.min(48, asset.height * 0.4))}px`, // Dynamic font size based on height
                     textAlign: 'center',
-                    border: asset.isEditing ? '1px dashed rgba(255,255,255,0.5)' : 'none',
+                    border: asset.isEditing ? '1px dashed rgba(0,0,0,0.5)' : 'none',
                     cursor: 'text',
                     pointerEvents: asset.isEditing ? 'auto' : 'none' // Only allow interaction when editing
                   }}
@@ -501,11 +501,12 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
               <div
                 onMouseDown={(e) => handleResizeStart(e, asset)}
                 className="
-                  absolute -bottom-2 -right-2
-                  w-4 h-4
+                  absolute -bottom-3 -right-3 sm:-bottom-2 sm:-right-2
+                  w-6 h-6 sm:w-4 sm:h-4
                   bg-white border border-blue-400
                   cursor-se-resize
                   z-10
+                  touch-none
                 "
               />
             )}
@@ -514,15 +515,15 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
             {selected && (
               <>
                 {/* connector line */}
-                <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-px h-10 bg-blue-400 z-10" />
+                <div className="absolute -top-6 sm:-top-10 left-1/2 -translate-x-1/2 w-px h-6 sm:h-10 bg-blue-400 z-10" />
 
                 {/* rotate knob */}
                 <div
                   onMouseDown={(e) => handleRotateStart(e, asset)}
                   title="Rotate"
                   className="
-                    absolute -top-14 left-1/2 -translate-x-1/2
-                    w-6 h-6
+                    absolute -top-10 sm:-top-14 left-1/2 -translate-x-1/2
+                    w-8 h-8 sm:w-6 sm:h-6
                     rounded-full
                     bg-blue-500
                     border-2 border-blue-300
@@ -532,6 +533,7 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
                     hover:scale-110
                     transition-transform
                     z-10
+                    touch-none
                   "
                 />
               </>

@@ -6,7 +6,7 @@ import Key from './Key'
 import html2canvas from 'html2canvas'
 
 function Main() {
-  const [bgColor, setBgColor] = useState('#0f172a')
+  const [bgColor, setBgColor] = useState('#ffffff')
   
   // Animation state
   const [currentTime, setCurrentTime] = useState(0) // 0-100
@@ -21,7 +21,7 @@ function Main() {
   const [historyIndex, setHistoryIndex] = useState(-1)
   
   // Text properties
-  const [textColor, setTextColor] = useState('#ffffff')
+  const [textColor, setTextColor] = useState('#000000')
   const [textFont, setTextFont] = useState('Arial')
   const [textBold, setTextBold] = useState(false)
   
