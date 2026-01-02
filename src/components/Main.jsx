@@ -68,14 +68,32 @@ function Main() {
 
   // Add text asset
   const handleAddText = () => {
+    // Get current screen size for responsive positioning
+    const screenWidth = window.innerWidth
+    let canvasWidth, canvasHeight
+    
+    if (screenWidth < 640) { // mobile
+      canvasWidth = 320
+      canvasHeight = 200
+    } else if (screenWidth < 768) { // tablet
+      canvasWidth = 600
+      canvasHeight = 350
+    } else if (screenWidth < 1024) { // medium
+      canvasWidth = 800
+      canvasHeight = 450
+    } else { // desktop
+      canvasWidth = 1000
+      canvasHeight = 580
+    }
+    
     // Create text asset immediately in center of canvas
     const rgbColor = hexToRgb(textColor)
     const newTextAsset = {
       id: crypto.randomUUID(),
       type: 'text',
       text: 'Type here...',
-      x: 400, // Center of canvas
-      y: 200,
+      x: canvasWidth / 2 - 100, // Center horizontally (subtract half width)
+      y: canvasHeight / 2 - 25, // Center vertically (subtract half height)
       width: 200,
       height: 50,
       rotation: 0,
@@ -373,13 +391,14 @@ function Main() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4 order-2 sm:order-3">
-          <div className="flex items-center gap-1 sm:gap-2 hidden sm:flex">
-            <span className="text-xs sm:text-sm opacity-70">Canvas</span>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <span className="text-xs sm:text-sm opacity-70 hidden xs:inline">Canvas</span>
             <input
               type="color"
               value={bgColor}
               onChange={(e) => setBgColor(e.target.value)}
-              className="w-7 h-7 sm:w-9 sm:h-9 rounded-md cursor-pointer bg-transparent"
+              className="w-6 h-6 sm:w-7 sm:h-7 lg:w-9 lg:h-9 rounded-md cursor-pointer bg-transparent"
+              title="Canvas Color"
             />
           </div>
 

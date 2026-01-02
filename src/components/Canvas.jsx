@@ -71,13 +71,31 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
     if (!file || !file.type.startsWith('image/')) return
 
     const url = URL.createObjectURL(file)
+    
+    // Get current screen size for responsive positioning
+    const screenWidth = window.innerWidth
+    let canvasWidth, canvasHeight
+    
+    if (screenWidth < 640) { // mobile
+      canvasWidth = 320
+      canvasHeight = 200
+    } else if (screenWidth < 768) { // tablet
+      canvasWidth = 600
+      canvasHeight = 350
+    } else if (screenWidth < 1024) { // medium
+      canvasWidth = 800
+      canvasHeight = 450
+    } else { // desktop
+      canvasWidth = 1000
+      canvasHeight = 580
+    }
 
     const newAsset = {
       id: crypto.randomUUID(),
       type: 'image',
       src: url,
-      x: 400,
-      y: 200,
+      x: canvasWidth / 2 - 80, // Center horizontally (subtract half width)
+      y: canvasHeight / 2 - 80, // Center vertically (subtract half height)
       width: 160,
       height: 160,
       rotation: 0
@@ -361,10 +379,57 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
       style={{ backgroundColor: bgColor }}
     >
       {assets.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs text-white/40">
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
+          <span className="text-xs sm:text-sm text-white/40 text-center px-4">
             Drop PNG or JPG here or use the Text tool to add text
           </span>
+          <label className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white rounded-lg cursor-pointer transition-colors text-xs sm:text-sm font-medium">
+            Upload Image
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0]
+                if (file && file.type.startsWith('image/')) {
+                  const url = URL.createObjectURL(file)
+                  
+                  // Get current screen size for responsive positioning
+                  const screenWidth = window.innerWidth
+                  let canvasWidth, canvasHeight
+                  
+                  if (screenWidth < 640) { // mobile
+                    canvasWidth = 320
+                    canvasHeight = 200
+                  } else if (screenWidth < 768) { // tablet
+                    canvasWidth = 600
+                    canvasHeight = 350
+                  } else if (screenWidth < 1024) { // medium
+                    canvasWidth = 800
+                    canvasHeight = 450
+                  } else { // desktop
+                    canvasWidth = 1000
+                    canvasHeight = 580
+                  }
+                  
+                  const newAsset = {
+                    id: crypto.randomUUID(),
+                    type: 'image',
+                    src: url,
+                    x: canvasWidth / 2 - 80, // Center horizontally (subtract half width)
+                    y: canvasHeight / 2 - 80, // Center vertically (subtract half height)
+                    width: 160,
+                    height: 160,
+                    rotation: 0
+                  }
+                  setAssets((prev) => [...prev, newAsset])
+                  if (saveToHistory) saveToHistory()
+                }
+                // Reset input value so that same file can be selected again
+                e.target.value = ''
+              }}
+              className="hidden"
+            />
+          </label>
         </div>
       )}
 
