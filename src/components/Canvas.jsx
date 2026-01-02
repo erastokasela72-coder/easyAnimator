@@ -4,6 +4,14 @@ function lerp(a, b, t) {
   return a + (b - a) * t
 }
 
+// Helper function to get coordinates from both mouse and touch events
+function getCoordinates(e) {
+  if (e.touches && e.touches.length > 0) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY }
+  }
+  return { x: e.clientX, y: e.clientY }
+}
+
 const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyframes, setKeyframes, onAssetsChange, assets, setAssets, saveToHistory, textProperties }, ref) {
   const [selectedId, setSelectedId] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -111,10 +119,11 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
     setSelectedId(asset.id)
     setIsEditing(true)
 
+    const coords = getCoordinates(e)
     dragRef.current = {
       id: asset.id,
-      startX: e.clientX,
-      startY: e.clientY,
+      startX: coords.x,
+      startY: coords.y,
       origX: asset.x,
       origY: asset.y
     }
@@ -125,10 +134,11 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
     e.stopPropagation()
     setIsEditing(true)
 
+    const coords = getCoordinates(e)
     resizeRef.current = {
       id: asset.id,
-      startX: e.clientX,
-      startY: e.clientY,
+      startX: coords.x,
+      startY: coords.y,
       origW: asset.width,
       origH: asset.height
     }
@@ -145,9 +155,10 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
     const centerX = asset.x + asset.width / 2
     const centerY = asset.y + asset.height / 2
     
-    // Get mouse position relative to canvas
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
+    // Get position relative to canvas
+    const coords = getCoordinates(e)
+    const mouseX = coords.x - rect.left
+    const mouseY = coords.y - rect.top
     
     // Calculate initial angle
     const initialAngle = (Math.atan2(mouseY - centerY, mouseX - centerX) * 180) / Math.PI
@@ -163,10 +174,12 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
 
   /* ---------- GLOBAL MOVE ---------- */
   function handleMouseMove(e) {
+    const coords = getCoordinates(e)
+    
     if (dragRef.current) {
       const { id, startX, startY, origX, origY } = dragRef.current
-      const dx = e.clientX - startX
-      const dy = e.clientY - startY
+      const dx = coords.x - startX
+      const dy = coords.y - startY
 
       setAssets((prev) =>
         prev.map((a) =>
@@ -177,8 +190,8 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
 
     if (resizeRef.current) {
       const { id, startX, startY, origW, origH } = resizeRef.current
-      const dx = e.clientX - startX
-      const dy = e.clientY - startY
+      const dx = coords.x - startX
+      const dy = coords.y - startY
 
       setAssets((prev) =>
         prev.map((a) =>
@@ -199,9 +212,9 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
       const rect = ref.current.getBoundingClientRect()
       const { id, centerX, centerY, initialAngle, initialRotation } = rotateRef.current
       
-      // Get mouse position relative to canvas
-      const mouseX = e.clientX - rect.left
-      const mouseY = e.clientY - rect.top
+      // Get position relative to canvas
+      const mouseX = coords.x - rect.left
+      const mouseY = coords.y - rect.top
       
       // Calculate current angle
       const currentAngle = (Math.atan2(mouseY - centerY, mouseX - centerX) * 180) / Math.PI
@@ -364,6 +377,8 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onTouchMove={handleMouseMove}
+      onTouchEnd={handleMouseUp}
       onClick={handleCanvasClick}
       className="
         relative
@@ -460,6 +475,10 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
                 // Always allow moving, textarea will handle its own events
                 handleMoveStart(e, asset)
               }}
+              onTouchStart={(e) => {
+                // Always allow moving, textarea will handle its own events
+                handleMoveStart(e, asset)
+              }}
               onClick={(e) => {
                 e.stopPropagation()
                 setSelectedId(asset.id)
@@ -500,6 +519,7 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
             {selected && (
               <div
                 onMouseDown={(e) => handleResizeStart(e, asset)}
+                onTouchStart={(e) => handleResizeStart(e, asset)}
                 className="
                   absolute -bottom-3 -right-3 sm:-bottom-2 sm:-right-2
                   w-6 h-6 sm:w-4 sm:h-4
@@ -520,6 +540,7 @@ const Canvas = forwardRef(function Canvas({ bgColor, currentTime, playing, keyfr
                 {/* rotate knob */}
                 <div
                   onMouseDown={(e) => handleRotateStart(e, asset)}
+                  onTouchStart={(e) => handleRotateStart(e, asset)}
                   title="Rotate"
                   className="
                     absolute -top-10 sm:-top-14 left-1/2 -translate-x-1/2
